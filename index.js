@@ -5,9 +5,12 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const patientRoutes = require('./routes/patientRoutes'); // Make sure the path is correct
+
 
 dotenv.config();
 const app = express();
+
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -52,11 +55,14 @@ app.post("/api/auth/login", async (req, res) => {
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return res.status(400).json({ message: "Invalid credentials" });
   }
-
+console.log(user, "user");
   // Generate JWT token
-  const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: "1h" });
+  const token = jwt.sign({ _id:user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
   res.json({ token });
 });
+
+app.use("/api/patients", patientRoutes); // Use the patient routes
+
 
 // **Start Server**
 const PORT = process.env.PORT || 6000;
